@@ -1,0 +1,105 @@
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+model Applicant {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  username String
+  email   String   @unique
+  password String
+  verificationToken    String?
+  isVerified           Boolean @default(false)
+  verificationTokenExpiry DateTime?
+  resetToken           String?
+  resetTokenExpiry     DateTime?
+  profile_pic         String? @default("https://res.cloudinary.com/dzvtkbjhc/image/upload/v1704196342/francc_ymmkkz.png")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  applications Application[] 
+}
+
+model Admin {
+  id       String  @id @default(auto()) @map("_id") @db.ObjectId
+  username String
+  email   String   @unique
+  password String
+  priviledge Boolean @default(true)
+  verificationToken    String?
+  isVerified           Boolean @default(false)
+  verificationTokenExpiry DateTime?
+  resetToken           String?
+  resetTokenExpiry     DateTime?
+  profile_pic         String? @default("https://res.cloudinary.com/dzvtkbjhc/image/upload/v1704196342/francc_ymmkkz.png")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  tenders Tender[]
+  
+}
+
+
+model Tender {
+  id          String  @id @default(auto())  @map("_id") @db.ObjectId
+  name        String
+  postBy      String
+  postDate    String
+  expiryDate  String
+  description String
+  admin         Admin     @relation(fields: [adminId], references: [id])
+  adminId       String    @db.ObjectId
+  applications  Application[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  OpeningVenue String @default("Online")
+  ClosingTime String @default("12:00 PM")
+  PublicLink String @default("https://main--rubys.netlify.app/")
+  DaysToClose String @default("0")
+  OCID String @default("0")
+  procurementMethod String @default("Open")
+  FinancialYear String @default("2024/2025")
+   subModules String[] @default([])
+  
+}
+
+
+model Application {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId 
+  status      String  @default("pending")
+  date        String
+  applicant   Applicant @relation(fields: [applicantId], references: [id])
+  applicantId String   @db.ObjectId // Treat applicantId as a MongoDB ObjectId
+  tender      Tender   @relation(fields: [tenderId], references: [id])
+  tenderId    String   @db.ObjectId // Treat tenderId as a MongoDB ObjectId
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  isDelivered Boolean @default(false)
+  proposal    String
+  NID         String  
+  amount     String
+  duration   String 
+  completionDate String
+  kraPin     String
+  location   String 
+  phoneNumber String @default("0700000000")
+  longitude  String @default("0.0")
+  latitude   String @default("0.0")
+  companyName String @default("Company Name")
+  contactPerson String @default("Contact Person")
+  contactEmail String @default("example@gmail.com")
+  contactPhone String @default("0700000000")
+  projectTitle String @default("Project Title")
+  projectDescription String @default("Project Description")
+  projectUnderstanding String @default("Project Understanding")
+  companyWebsite String @default("https://www.example.com")
+  timeline String @default("Timeline")
+  closingStatement String @default("Closing Statement")
+  // https://res.cloudinary.com/demo/image/upload/c_scale,w_300/multi_page_pdf.jpg
+  bankStamentUrlAttachment String @default("https://res.cloudinary.com/dzvtkbjhc/image/upload/v1708521141/w2sy8yqi4m7ow0jmavjs.png")
+  subModules String[] @default([])
+
+}
